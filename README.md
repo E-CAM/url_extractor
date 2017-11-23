@@ -1,18 +1,34 @@
 This is a [Clowder](https://clowder.ncsa.illinois.edu) extractor for URLs. It will create a thumbnail
-every website giving to it.
+every website giving to it. For this is will use selenium and chrome.
+
+# Selenium
+
+You need a running selenium instance. Using docker:
+```
+docker run -e SCREEN_WIDTH=1920 -e SCREEN_HEIGHT=1080 -p 4444:4444 selenium/standalone-chrome:3.7.1-beryllium
+```
+The environment variable `SELENIUM_URI` should point to the location of the selenium instance. By default
+it points to: `http://localhost:4444/wd/hub`.
 
 # Input format
 
 It expects JSON input:
 ```json
 {
-    "url": "http://www.google.com"
+    "URL": "https://clowder.ncsa.illinois.edu/"
 }
 ```
 
 # Metadata format
 
-To Do
+The extractor will generate following metadata:
+```json
+{
+    "URL": "https://clowder.ncsa.illinois.edu/",
+    "date": "2017-11-23T20:58:05.799474",
+    "title": "Clowder - Research Data Management in the Cloud"
+}
+```
 
 # Docker
 
