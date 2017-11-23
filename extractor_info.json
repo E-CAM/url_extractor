@@ -1,0 +1,27 @@
+{
+  "@context": "http://clowder.ncsa.illinois.edu/contexts/extractors.jsonld",
+  "name": "ncsa.urlextractor",
+  "version": "1.0",
+  "description": "URL extractor.",
+  "author": "Ward Poelmans <wpoely86@gmail.com>",
+  "contributors": [],
+  "repository": {
+    "repType": "git",
+    "repUrl": "https://opensource.ncsa.illinois.edu/stash/scm/cats/pyclowder.git"
+  },
+    "contexts": [
+    {
+        "URL": "http://schema.org/url",
+        "title": "http://schema.org/Text",
+        "date": "http://schema.org/DateTime"
+    }
+  ],
+  "process": {
+    "file": [
+      ""
+    ]
+  },
+  "external_services": [],
+  "dependencies": [],
+  "bibtex": []
+}
