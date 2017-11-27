@@ -38,7 +38,7 @@ class URLExtractor(Extractor):
 
     def check_message(self, connector, host, secret_key, resource, parameters):  # pylint: disable=unused-argument,too-many-arguments
         """Check if the extractor should download the file or ignore it."""
-        if not resource['file_ext'] == '.json':
+        if not resource['file_ext'] == '.url':
             if parameters.get('action', '') != 'manual-submission':
                 self.logger.debug("Unknown filetype, skipping")
                 return pyclowder.utils.CheckMessage.ignore
