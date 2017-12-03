@@ -77,12 +77,16 @@ class URLExtractor(Extractor):
             browser.set_window_size(1920, 1080)
 
             browser.get(url)
-            browser.get_screenshot_as_file(os.path.join(tempdir, "website.png"))
-            pyclowder.files.upload_preview(connector, host, secret_key, resource['id'], os.path.join(tempdir, "website.png"), None)
+
+            screenshot_png = browser.get_screenshot_as_png()
+            with open(os.path.join(tempdir, "website.urlscreenshot"), 'wb') as f:
+                f.write(screenshot_png)
+
+            pyclowder.files.upload_preview(connector, host, secret_key, resource['id'], os.path.join(tempdir, "website.urlscreenshot"), None)
 
             url_metadata['title'] = browser.title
             url_metadata['date'] = datetime.datetime.now().isoformat()
-        except (TimeoutException, WebDriverException, RemoteDriverServerException, ErrorInResponseException) as err:
+        except (TimeoutException, WebDriverException, RemoteDriverServerException, ErrorInResponseException, IOError) as err:
             self.logger.error("Failed to fetch %s: %s", url, err)
         finally:
             browser.quit()
