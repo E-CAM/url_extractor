@@ -1,5 +1,5 @@
 This is a [Clowder](https://clowder.ncsa.illinois.edu) extractor for URLs. It will create a thumbnail
-every website giving to it. For this is will use selenium and chrome.
+every website giving to it. For this is will use [Selenium](https://seleniumhq.github.io) with the Chrome webdriver.
 
 # Selenium
 
@@ -30,6 +30,28 @@ The extractor will generate following metadata:
 }
 ```
 
+# Previewer
+
+In the subdirectory `urlpreviewer` you can find a Clowder previewer: it will show the screenshot
+of the webpagina and open an iframe to the site if clicked.
+
+# Installation
+
+The extractor can most simply be run with docker (see below). To run it directly, it only requires pyclowder and
+a running instance of Selenium with the Chrome webdriver.
+
+The previewer need to put this directory under the `custom/public/javascripts/previewers/` directory of Clowder.
+It should be picked up automatically by Clowder.
+
+You also need to add some custom types to Clowder: to do this add the following lines
+to your `mimetypes.conf` file:
+```
+mimetype.jsonurl=text/url
+mimetype.JSONURL=text/url
+mimetype.urlscreenshot=image/urlscreenshot
+mimetype.URLSCREENSHOT=image/urlscreenshot
+```
+
 # Docker
 
 This extractor is ready to be run as a docker container. To build the docker container run:
@@ -41,8 +63,9 @@ docker build -t clowder_urlextractor .
 To run the docker containers use:
 
 ```
-docker run -t -i --rm -e "RABBITMQ_URI=amqp://rabbitmqserver/clowder" clowder_urlextractor
+docker run -t -i --rm -e "SELENIUM_URI=http://localhost:4444/wd/hub" -e "RABBITMQ_URI=amqp://rabbitmqserver/clowder" clowder_urlextractor
 docker run -t -i --rm --link clowder_rabbitmq_1:rabbitmq clowder_urlextractor
 ```
 
-The RABBITMQ_URI and RABBITMQ_EXCHANGE environment variables can be used to control what RabbitMQ server and exchange it will bind itself to, you can also use the --link option to link the extractor to a RabbitMQ container.
+The RABBITMQ_URI and RABBITMQ_EXCHANGE environment variables can be used to control what RabbitMQ server and exchange it will bind
+itself to, you can also use the --link option to link the extractor to a RabbitMQ container.
