@@ -57,7 +57,7 @@ mimetype.URLSCREENSHOT=image/urlscreenshot
 This extractor is ready to be run as a docker container. To build the docker container run:
 
 ```
-docker build -t clowder_urlextractor .
+docker build -t clowder/urlextractor .
 ```
 
 To run the docker containers use:
@@ -69,3 +69,27 @@ docker run -t -i --rm --link clowder_rabbitmq_1:rabbitmq clowder_urlextractor
 
 The RABBITMQ_URI and RABBITMQ_EXCHANGE environment variables can be used to control what RabbitMQ server and exchange it will bind
 itself to, you can also use the --link option to link the extractor to a RabbitMQ container.
+
+## Docker compose
+
+If you want to add the extractor to a docker compose file it should look something like:
+
+```yaml
+    selenium:
+      image: selenium/standalone-chrome:3.7.1-beryllium
+      environment:
+          SCREEN_WIDTH: 1920
+          SCREEN_HEIGHT: 1080
+      ports:
+          - "4444:4444"
+
+    urlextractor:
+      image: clowder/urlextractor
+      links:
+        - clowder
+        - rabbitmq
+        - selenium
+      environment:
+        RABBITMQ_URI: "amqp://guest:guest@rabbitmq:5672/%2f"
+        SELENIUM_URI: "http://selenium:4444/wd/hub"
+```

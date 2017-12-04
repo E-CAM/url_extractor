@@ -10,42 +10,24 @@ MAINTAINER Ward Poelmans <wpoely86@gmail.com>
 # could be https://clowder.ncsa.illinois.edu/clowder/api/extractors?key=secretKey
 ENV RABBITMQ_URI="" \
     RABBITMQ_EXCHANGE="clowder" \
-    RABBITMQ_QUEUE="ncsa.videopresentation" \
+    RABBITMQ_QUEUE="ncsa.urlextractor" \
     REGISTRATION_ENDPOINTS="https://clowder.ncsa.illinois.edu/extractors" \
-    MAIN_SCRIPT="video-presentation.py"
+    MAIN_SCRIPT="url-extractor.py" \
+    SELENIUM_URI="http://localhost:4444/wd/hub"
 
 # Install any programs needed
-RUN apt-get update && apt-get install -y \
-     ffmpeg libavcodec-dev libavfilter-dev libavformat-dev \
-     python-pip \
-     python2.7-dev cmake git pkg-config wget build-essential && \
-     apt-get -y build-dep python-opencv && \
+RUN apt-get update && apt-get install -y python-pip git && \
      rm -rf /var/lib/apt/lists/*
-
-RUN wget -O opencv.tar.gz https://github.com/opencv/opencv/archive/3.3.1.tar.gz && \
-    tar -xvzf opencv.tar.gz && \
-    cd opencv-* && \
-    mkdir build && \
-    cd build && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -D BUILD_PYTHON_SUPPORT=ON -DWITH_FFMPEG=ON .. && \
-    make -j4 && \
-    make install && \
-    cd ../.. && \
-    rm -rf opencv-*
-
-# This provides a recent version of OpenCV
-#RUN pip install -U opencv-contrib-python
 
 # Until our PR is merged in master, install manually
 # https://opensource.ncsa.illinois.edu/bitbucket/projects/CATS/repos/pyclowder2/pull-requests/55/overview
 RUN pip install -U git+https://github.com/wpoely86/pyclowder2.git@feature/upload_section_description
+RUN pip install selenium
 
 # Switch to clowder, copy files and be ready to run
 USER clowder
 
 # command to run when starting docker
 COPY entrypoint.sh *.py extractor_info.json /home/clowder/
-RUN mkdir /home/clowder/config
-COPY config /home/clowder/config
 ENTRYPOINT ["/home/clowder/entrypoint.sh"]
 CMD ["extractor"]
