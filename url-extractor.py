@@ -66,6 +66,7 @@ class URLExtractor(Extractor):
             'URL': url
         }
 
+        browser = None
         try:
             desired_capabilities = DesiredCapabilities.CHROME.copy()
             desired_capabilities['chromeOptions'] = {
@@ -89,7 +90,8 @@ class URLExtractor(Extractor):
         except (TimeoutException, WebDriverException, RemoteDriverServerException, ErrorInResponseException, IOError) as err:
             self.logger.error("Failed to fetch %s: %s", url, err)
         finally:
-            browser.quit()
+            if browser:
+                browser.quit()
 
         metadata = self.get_metadata(url_metadata, 'file', resource['id'], host)
         self.logger.debug("New metadata: %s", metadata)
