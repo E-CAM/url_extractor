@@ -19,9 +19,6 @@ ENV RABBITMQ_URI="" \
 RUN apt-get update && apt-get install -y python-pip git && \
      rm -rf /var/lib/apt/lists/*
 
-# Until our PR is merged in master, install manually
-# https://opensource.ncsa.illinois.edu/bitbucket/projects/CATS/repos/pyclowder2/pull-requests/55/overview
-RUN pip install -U git+https://github.com/wpoely86/pyclowder2.git@feature/upload_section_description
 RUN pip install selenium requests lxml beautifulsoup4
 
 # Switch to clowder, copy files and be ready to run
