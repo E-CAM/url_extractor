@@ -100,14 +100,21 @@ class URLExtractor(Extractor):
             'date': datetime.datetime.now().isoformat(),
         }
 
-        req = requests.get(url)
-        self.logger.debug("headers: %s", req.headers)
         try:
-            soup = BeautifulSoup(req.text, "lxml")
-            url_metadata['title'] = soup.find("title").string
-        except AttributeError as err:
-            self.loger.error("Failed to extract title from webpage %s: %s", url, err)
-            url_metadata['title'] = ''
+            req = requests.get(url)
+            req.raise_for_status()
+
+            self.logger.debug("headers: %s", req.headers)
+
+            try:
+                soup = BeautifulSoup(req.text, "lxml")
+                url_metadata['title'] = soup.find("title").string
+            except AttributeError as err:
+                self.loger.error("Failed to extract title from webpage %s: %s", url, err)
+                url_metadata['title'] = ''
+
+        except requests.exceptions.RequestException as err:
+            self.loger.error("Failed to fetch URL %s: %s", url, err)
 
         browser = None
         try:
