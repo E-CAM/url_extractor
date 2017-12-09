@@ -10,11 +10,14 @@ import datetime
 import json
 import logging
 import os
+import re
 import shutil
 import tempfile
 
 import pyclowder
+import requests
 import yaml
+from bs4 import BeautifulSoup
 from pyclowder.extractors import Extractor
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, WebDriverException, RemoteDriverServerException, ErrorInResponseException
@@ -89,8 +92,18 @@ class URLExtractor(Extractor):
             self.logger.error("Failed to read or parse %s as URL input file: %s", resource['local_paths'][0], err)
 
         url_metadata = {
-            'URL': url
+            'URL': url,
+            'date': datetime.datetime.now().isoformat(),
         }
+
+        req = requests.get(url)
+        self.logger.debug("headers: %s", req.headers)
+        try:
+            soup = BeautifulSoup(req.text, "lxml")
+            url_metadata['title'] = soup.find("title").string
+        except AttributeError as err:
+            self.loger.error("Failed to extract title from webpage %s: %s", url, err)
+            url_metadata['title'] = ''
 
         browser = None
         try:
@@ -110,9 +123,6 @@ class URLExtractor(Extractor):
                 f.write(screenshot_png)
 
             pyclowder.files.upload_preview(connector, host, secret_key, resource['id'], os.path.join(tempdir, "website.urlscreenshot"), None)
-
-            url_metadata['title'] = browser.title
-            url_metadata['date'] = datetime.datetime.now().isoformat()
         except (TimeoutException, WebDriverException, RemoteDriverServerException, ErrorInResponseException, IOError) as err:
             self.logger.error("Failed to fetch %s: %s", url, err)
         finally:
