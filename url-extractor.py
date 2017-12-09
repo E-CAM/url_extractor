@@ -14,10 +14,10 @@ import re
 import shutil
 import tempfile
 
-import pyclowder
 import requests
 import yaml
 from bs4 import BeautifulSoup
+import pyclowder
 from pyclowder.extractors import Extractor
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, WebDriverException, RemoteDriverServerException, ErrorInResponseException
