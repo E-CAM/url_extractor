@@ -14,6 +14,7 @@ import shutil
 import tempfile
 
 import pyclowder
+import yaml
 from pyclowder.extractors import Extractor
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, WebDriverException, RemoteDriverServerException, ErrorInResponseException
@@ -34,7 +35,30 @@ class URLExtractor(Extractor):
         self.logger = logging.getLogger(__name__)
 
         self.selenium = os.getenv('SELENIUM_URI', 'http://localhost:4444/wd/hub')
+        self.window_size = (1366, 768)  # the default
+        self.read_settings()
 
+    def read_settings(self, filename=None):
+        """
+        Read the default settings for the extractor from the given file.
+        :param filename: optional path to settings file (defaults to 'settings.yml' in the current directory)
+        """
+        if filename is None:
+            filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config", "settings.yml")
+
+        if not os.path.isfile(filename):
+            self.logger.warning("No config file found at %s", filename)
+            return
+
+        try:
+            with open(filename, 'r') as settingsfile:
+                settings = yaml.safe_load(settingsfile)
+                if settings.get("window_size"):
+                    self.window_size = tuple(settings.get("window_size"))
+        except (IOError, yaml.YAMLError) as err:
+            self.logger.error("Failed to read or parse %s as settings file: %s", filename, err)
+
+        self.logger.debug("Read settings from %s: %s", filename, self.window_size)
 
     def check_message(self, connector, host, secret_key, resource, parameters):  # pylint: disable=unused-argument,too-many-arguments
         """Check if the extractor should download the file or ignore it."""
@@ -52,6 +76,8 @@ class URLExtractor(Extractor):
         self.logger.debug("Clowder host: %s", host)
         self.logger.debug("Received resources: %s", resource)
         self.logger.debug("Received parameters: %s", parameters)
+
+        self.read_settings()
 
         tempdir = tempfile.mkdtemp(prefix='clowder-url-extractor')
 
@@ -75,7 +101,7 @@ class URLExtractor(Extractor):
             browser = webdriver.Remote(command_executor=self.selenium, desired_capabilities=desired_capabilities)
             browser.set_script_timeout(30)
             browser.set_page_load_timeout(30)
-            browser.set_window_size(1920, 1080)
+            browser.set_window_size(self.window_size[0], self.window_size[1])
 
             browser.get(url)
 
