@@ -91,6 +91,10 @@ class URLExtractor(Extractor):
         except (IOError, ValueError, KeyError) as err:
             self.logger.error("Failed to read or parse %s as URL input file: %s", resource['local_paths'][0], err)
 
+        if not re.match("^https?://", url):
+            self.logger.error("Invalid url: %s", url)
+            return
+
         url_metadata = {
             'URL': url,
             'date': datetime.datetime.now().isoformat(),
