@@ -55,7 +55,7 @@ class URLExtractor(Extractor):
 
         try:
             with open(filename, 'r') as settingsfile:
-                settings = yaml.safe_load(settingsfile)
+                settings = yaml.safe_load(settingsfile) or {}
                 if settings.get("window_size"):
                     self.window_size = tuple(settings.get("window_size"))
         except (IOError, yaml.YAMLError) as err:
