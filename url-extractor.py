@@ -104,7 +104,8 @@ class URLExtractor(Extractor):
             req = requests.get(url)
             req.raise_for_status()
 
-            self.logger.debug("headers: %s", req.headers)
+            if req.headers.get("X-Frame-Options"):
+                url_metadata['X-Frame-Options'] = req.headers['X-Frame-Options'].upper()
 
             try:
                 soup = BeautifulSoup(req.text, "lxml")
@@ -112,6 +113,14 @@ class URLExtractor(Extractor):
             except AttributeError as err:
                 self.loger.error("Failed to extract title from webpage %s: %s", url, err)
                 url_metadata['title'] = ''
+
+            if not url.startswith("https"):
+                # check if we can upgrade to https
+                req_https = requests.get(url.replace("http", "https", 1))
+                # currently, we only check for a 200 return code, maybe also check if page is the same?
+                if req_https.status_code == 200:
+                    # we can upgrade!
+                    url_metadata['tls'] = True
 
         except requests.exceptions.RequestException as err:
             self.loger.error("Failed to fetch URL %s: %s", url, err)
