@@ -16,7 +16,7 @@ ENV RABBITMQ_URI="" \
     SELENIUM_URI="http://localhost:4444/wd/hub"
 
 # Install any programs needed
-RUN apt-get update && apt-get install -y python-pip git && \
+RUN apt-get update && apt-get install -y python-pip && \
      rm -rf /var/lib/apt/lists/*
 
 RUN pip install selenium requests lxml beautifulsoup4
@@ -26,5 +26,7 @@ USER clowder
 
 # command to run when starting docker
 COPY entrypoint.sh *.py extractor_info.json /home/clowder/
+RUN mkdir /home/clowder/config
+COPY config /home/clowder/config
 ENTRYPOINT ["/home/clowder/entrypoint.sh"]
 CMD ["extractor"]
