@@ -111,7 +111,7 @@ class URLExtractor(Extractor):
                 soup = BeautifulSoup(req.text, "lxml")
                 url_metadata['title'] = soup.find("title").string
             except AttributeError as err:
-                self.loger.error("Failed to extract title from webpage %s: %s", url, err)
+                self.logger.error("Failed to extract title from webpage %s: %s", url, err)
                 url_metadata['title'] = ''
 
             if not url.startswith("https"):
@@ -123,7 +123,7 @@ class URLExtractor(Extractor):
                     url_metadata['tls'] = True
 
         except requests.exceptions.RequestException as err:
-            self.loger.error("Failed to fetch URL %s: %s", url, err)
+            self.logger.error("Failed to fetch URL %s: %s", url, err)
 
         browser = None
         try:
