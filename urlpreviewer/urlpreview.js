@@ -15,7 +15,7 @@
 
     s = document.createElement("style");
     s.type = "text/css";
-    s.append(".myiframebox { overflow-y: auto; }");
+    s.append(".featherlight-iframe .featherlight-content { overflow-y: auto; }");
     $(useTab).append(s)
 
     var extractor_req = $.ajax({
