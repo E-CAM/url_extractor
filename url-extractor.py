@@ -124,7 +124,7 @@ class URLExtractor(Extractor):
                 else:
                     url_metadata['tls'] = False
             else:
-               url_metadata['tls'] = True
+                url_metadata['tls'] = True
 
         except requests.exceptions.RequestException as err:
             self.logger.error("Failed to fetch URL %s: %s", url, err)
