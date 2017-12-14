@@ -121,6 +121,10 @@ class URLExtractor(Extractor):
                 if req_https.status_code == 200:
                     # we can upgrade!
                     url_metadata['tls'] = True
+                else:
+                    url_metadata['tls'] = False
+            else:
+               url_metadata['tls'] = True
 
         except requests.exceptions.RequestException as err:
             self.logger.error("Failed to fetch URL %s: %s", url, err)
@@ -143,6 +147,8 @@ class URLExtractor(Extractor):
                 f.write(screenshot_png)
 
             pyclowder.files.upload_preview(connector, host, secret_key, resource['id'], os.path.join(tempdir, "website.urlscreenshot"), None)
+            # Also upload as a thumbnail
+	    pyclowder.files.upload_thumbnail(connector, host, secret_key, resource['id'], os.path.join(tempdir, "website.urlscreenshot"))
         except (TimeoutException, WebDriverException, RemoteDriverServerException, ErrorInResponseException, IOError) as err:
             self.logger.error("Failed to fetch %s: %s", url, err)
         finally:

@@ -47,14 +47,18 @@
         $(Configuration.tab).append("<a href='" + fullurl + "' id='mypreviewlink'><img class='fit-in-space' src='" + preview + "'/></a>");
 
         // lets assume if it has any value, we shouldn't iframe it.
-        if(extract_data[0][0]['content'].hasOwnProperty('X-Frame-Options')) {
+        if(extract_data[0][0]['content'].hasOwnProperty('X-Frame-Options') || (location.protocol == 'https:' && !extract_data[0][0]['content']['tls']) ) {
             $('#mypreviewlink').attr('target', '_blank');
         } else {
-            $('#mypreviewlink').featherlight(fullurl, {type:'iframe', variant: 'myiframebox', loading: 'Loading ' + fullurl, iframeWidth: $(window).width() * 0.8, iframeHeight: $(window).height() * 0.8});
+            if(location.protocol == 'https:'){
+                fullurl = fullurl.replace(/^http:\/\//i, 'https://');
+            }
+            $('#mypreviewlink').featherlight(fullurl, {type:'iframe', variant: 'myiframebox', loading: 'Loading ' + fullurl, iframeWidth: $(window).width() * 0.85, iframeHeight: $(window).height() * 0.85});
         }
+        // Collapse the extractor info
+        $('.collapse').collapse("hide");
 
     }).fail(function(err){
         console.log("Failed to load all scripts and data for URL previewer: " + err['status'] + " - " + err['statusText']);
     });
-    
 }(jQuery, Configuration));
