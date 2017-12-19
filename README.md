@@ -31,7 +31,7 @@ The extractor will generate following metadata:
     "title": "Clowder - Research Data Management in the Cloud"
 }
 ```
-where `tls` indicates whether the site can be served over https and `X-Frame-Options` indicates of the site can be placed in an iframe.
+where `tls` indicates whether the site can be served over https and `X-Frame-Options` indicates if the site can be placed in an iframe.
 
 # Previewer
 
