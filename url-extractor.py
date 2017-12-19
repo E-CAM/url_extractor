@@ -114,17 +114,15 @@ class URLExtractor(Extractor):
                 self.logger.error("Failed to extract title from webpage %s: %s", url, err)
                 url_metadata['title'] = ''
 
+            # Assume that we can use https for the link
+            url_metadata['tls'] = True
             if not url.startswith("https"):
                 # check if we can upgrade to https
                 req_https = requests.get(url.replace("http", "https", 1))
                 # currently, we only check for a 200 return code, maybe also check if page is the same?
-                if req_https.status_code == 200:
-                    # we can upgrade!
-                    url_metadata['tls'] = True
-                else:
-                    url_metadata['tls'] = False
-            else:
-                url_metadata['tls'] = True
+                if req_https.status_code != 200:
+                    # we can't upgrade :( 
+                    url_metadata['tls'] = False                
 
         except requests.exceptions.RequestException as err:
             self.logger.error("Failed to fetch URL %s: %s", url, err)
