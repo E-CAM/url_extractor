@@ -26,14 +26,17 @@ The extractor will generate following metadata:
 {
     "URL": "https://clowder.ncsa.illinois.edu/",
     "date": "2017-11-23T20:58:05.799474",
+    "X-Frame-Options": "DENY",
+    "tls": true,
     "title": "Clowder - Research Data Management in the Cloud"
 }
 ```
+where `tls` indicates whether the site can be served over https and `X-Frame-Options` indicates of the site can be placed in an iframe.
 
 # Previewer
 
 In the subdirectory `urlpreviewer` you can find a Clowder previewer: it will show the screenshot
-of the webpagina and open an iframe to the site if clicked.
+of the webpage and open an iframe to the site if clicked (when possible, otherwise it will open the link in a new tab).
 
 # Installation
 
