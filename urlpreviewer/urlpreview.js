@@ -32,6 +32,37 @@
         context: this,
     });
 
+    // Create a toggle for all metadata
+    toggleMetadata = function(){
+        var small = "col-md-4 col-sm-4 col-lg-4"
+        var medium = "col-md-8 col-sm-8 col-lg-8"
+        var large = "col-md-12 col-sm-12 col-lg-12"
+        // First small item is the file metadata
+        var fileMetadata = document.getElementsByClassName(small)[0];
+        if (fileMetadata.style.display === "none") {
+            fileMetadata.style.display = "block";
+            // Shrink the main div
+            mainDiv = document.getElementsByClassName(large)[0];
+            mainDiv.className = medium
+        } else {
+            fileMetadata.style.display = "none";
+            // Expand the main div
+            mainDiv = document.getElementsByClassName(medium)[0];
+            mainDiv.className = large
+        }
+    }
+
+    activateComments = function(){
+        var tabclass = "nav nav-tabs margin-bottom-20"
+        var tabs = document.getElementsByClassName(tabclass)[0].getElementsByTagName("li");
+        // Make 3rd tab active
+        tabs[0].classList.remove("active");
+        tabs[2].classList.add("active");
+        document.getElementById("tab-metadata").classList.remove("active", "in");
+        document.getElementById("tab-comments").classList.add("active", "in");
+    }
+
+
     $.when(extractor_req, featherlight_req).done(function(extract_data, featherlight_data){
         var fullurl = extract_data[0][0]['content']['URL'];
 
@@ -57,6 +88,14 @@
         }
         // Collapse the extractor info
         $('.collapse').collapse("hide");
+
+        $(Configuration.tab).append("<br /><br /><button onclick=\"toggleMetadata()\">Toggle metadata for this item</button>");
+
+        // Once the page is loaded, give a default wide view and sure comments are the active tab
+        window.addEventListener("load", function(){
+            toggleMetadata();
+            activateComments();
+        });
 
     }).fail(function(err){
         console.log("Failed to load all scripts and data for URL previewer: " + err['status'] + " - " + err['statusText']);
