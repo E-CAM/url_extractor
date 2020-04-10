@@ -175,7 +175,7 @@ class URLExtractor(Extractor):
 
             # Also upload as a thumbnail
             self.try_upload_preview_file(pyclowder.files.upload_thumbnail, connector, host, secret_key, resource['id'],
-                                         os.path.join(tempdir, "website.urlscreenshot")
+                                         os.path.join(tempdir, "website.urlscreenshot"))
         except (TimeoutException, WebDriverException, RemoteDriverServerException, ErrorInResponseException, IOError) as err:
             self.logger.error("Failed to fetch %s: %s", url, err)
         finally:
