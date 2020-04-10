@@ -43,12 +43,12 @@
             fileMetadata.style.display = "block";
             // Shrink the main div
             mainDiv = document.getElementsByClassName(large)[0];
-            mainDiv.className = medium
+            mainDiv.className = medium;
         } else {
             fileMetadata.style.display = "none";
             // Expand the main div
             mainDiv = document.getElementsByClassName(medium)[0];
-            mainDiv.className = large
+            mainDiv.className = large;
         }
     }
 
@@ -73,7 +73,7 @@
             var preview = Configuration.url;
         }
 
-        $(Configuration.tab).append("<h1 align='center'><a href='" + fullurl + "' target='_blank'>" + extract_data[0][0]['content']['title'] + "</a></h1>");
+        $(Configuration.tab).append("<h4 align='center'>Please <a href='" + fullurl + "' target='_blank'>click here</a> or on image below to open content</h4>");
 
         $(Configuration.tab).append("<a href='" + fullurl + "' id='mypreviewlink'><img class='fit-in-space' src='" + preview + "'/></a>");
 
@@ -92,7 +92,7 @@
         $(Configuration.tab).append("<br /><br /><button onclick=\"toggleMetadata()\">Toggle metadata for this item</button>");
 
         // Once the page is loaded, give a default wide view and sure comments are the active tab
-        window.addEventListener("load", function(){
+        window.addEventListener("DOMContentLoaded", function(){
             toggleMetadata();
             activateComments();
         });

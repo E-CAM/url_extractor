@@ -1,4 +1,5 @@
 { "name" : "URL previewer",
   "main" : "urlpreview.js",
-  "contentType" : ["text/url", "image/urlscreenshot"]
+  "contentType" : ["text/url", "image/urlscreenshot"],
+  "preview": true
   } 
