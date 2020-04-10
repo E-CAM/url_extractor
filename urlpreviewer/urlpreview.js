@@ -92,7 +92,7 @@
         $(Configuration.tab).append("<br /><br /><button onclick=\"toggleMetadata()\">Toggle metadata for this item</button>");
 
         // Once the page is loaded, give a default wide view and sure comments are the active tab
-        window.addEventListener("DOMContentLoaded", function(){
+        window.addEventListener("load", function(){
             toggleMetadata();
             activateComments();
         });
