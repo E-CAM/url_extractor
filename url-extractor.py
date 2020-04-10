@@ -7,6 +7,7 @@ Author Ward Poelmans <wpoely86@gmail.com>
 """
 
 import datetime
+import time
 import json
 import logging
 import os
@@ -75,8 +76,8 @@ class URLExtractor(Extractor):
         return pyclowder.utils.CheckMessage.download  # or bypass
 
     def try_upload_preview_file(self, upload_func, connector, host, secret_key, resource_id, preview_file,
-                                parameters=None, allowed_failures=20, wait_between_failures=15):
-        # Compressing is very expensive, let's try to upload repeatedly for 5 minutes before failing
+                                parameters=None, allowed_failures=12, wait_between_failures=15):
+        # Compressing is very expensive, let's try to upload repeatedly for 3 minutes before failing
         for attempt in range(allowed_failures):
             try:
                 if attempt != 0:
