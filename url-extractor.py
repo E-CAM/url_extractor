@@ -7,6 +7,7 @@ Author Ward Poelmans <wpoely86@gmail.com>
 """
 
 import datetime
+import time
 import json
 import logging
 import os
@@ -70,9 +71,34 @@ class URLExtractor(Extractor):
                 self.logger.debug("Unknown filetype, skipping")
                 return pyclowder.utils.CheckMessage.ignore
             else:
-                self.logger.debug("Unknown filetype, but scanning by manuel request")
+                self.logger.debug("Unknown filetype, but scanning by manual request")
 
         return pyclowder.utils.CheckMessage.download  # or bypass
+
+    def try_upload_preview_file(self, upload_func, connector, host, secret_key, resource_id, preview_file,
+                                parameters=None, allowed_failures=12, wait_between_failures=15):
+        # Compressing is very expensive, let's try to upload repeatedly for 3 minutes before failing
+        for attempt in range(allowed_failures):
+            try:
+                if attempt != 0:
+                    time.sleep(wait_between_failures)
+                self.logger.info("Trying to upload preview file %s (Attempt %s)", preview_file, attempt)
+                if parameters is None:
+                    previewid = upload_func(connector, host, secret_key, resource_id, preview_file)
+                else:
+                    previewid = upload_func(connector, host, secret_key, resource_id, preview_file, parameters)
+            except Exception as ex:
+                template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                message = template.format(type(ex).__name__, ex.args)
+                self.logger.warning("Caught exception (attempt %s) for %s, trying up to %s times: %s", attempt,
+                                    preview_file, allowed_failures, message)
+            else:
+                break
+        else:
+            # Raise the last HTTPError
+            raise ex
+
+        return previewid
 
     def process_message(self, connector, host, secret_key, resource, parameters):  # pylint: disable=unused-argument,too-many-arguments
         """The actual extractor: we extract the URL from the JSON input and upload the results"""
@@ -144,9 +170,12 @@ class URLExtractor(Extractor):
             with open(os.path.join(tempdir, "website.urlscreenshot"), 'wb') as f:
                 f.write(screenshot_png)
 
-            pyclowder.files.upload_preview(connector, host, secret_key, resource['id'], os.path.join(tempdir, "website.urlscreenshot"), None)
+            self.try_upload_preview_file(pyclowder.files.upload_preview, connector, host, secret_key, resource['id'],
+                                         os.path.join(tempdir, "website.urlscreenshot"), parameters={})
+
             # Also upload as a thumbnail
-            pyclowder.files.upload_thumbnail(connector, host, secret_key, resource['id'], os.path.join(tempdir, "website.urlscreenshot"))
+            self.try_upload_preview_file(pyclowder.files.upload_thumbnail, connector, host, secret_key, resource['id'],
+                                         os.path.join(tempdir, "website.urlscreenshot")
         except (TimeoutException, WebDriverException, RemoteDriverServerException, ErrorInResponseException, IOError) as err:
             self.logger.error("Failed to fetch %s: %s", url, err)
         finally:
@@ -157,7 +186,8 @@ class URLExtractor(Extractor):
         self.logger.debug("New metadata: %s", metadata)
 
         # upload metadata
-        pyclowder.files.upload_metadata(connector, host, secret_key, resource['id'], metadata)
+        self.try_upload_preview_file(pyclowder.files.upload_metadata, connector, host, secret_key, resource['id'],
+                                     metadata)
 
         shutil.rmtree(tempdir, ignore_errors=True)
 
